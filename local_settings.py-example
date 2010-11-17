@@ -1,0 +1,12 @@
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
+EMAIL_HOST = "localhost"
+DEFAULT_FROM_EMAIL = "seb.bacon@gmail.com"
+OFFLINE = False
+
+DATABASE_NAME = 'myapp'             
+DATABASE_ENGINE = 'postgresql_psycopg2'
+DATABASE_USER = 'seb'
+DATABASE_PASSWORD = 'XXX'
+DATABASE_HOST = 'localhost'
+GOOGLE_ANALYTICS_ID = ""

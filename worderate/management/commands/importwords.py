@@ -56,15 +56,15 @@ class Command(BaseCommand):
             for x in range(0, len(line)-splitsize+1):
                 try:
                     stemword, _ = Word.objects.get_or_create(
+                        worddb=worddb,
                         word=line[x:x+splitsize])
                     stem, _ = Stem.objects.get_or_create(
-                        worddb=worddb,
                         word=stemword,
                         is_root=is_root)
                     tailword, _ = Word.objects.get_or_create(
+                        worddb=worddb,
                         word=line[x+splitsize:x+splitsize+1])
                     tail, _ = Tail.objects.get_or_create(
-                        worddb=worddb,
                         word=tailword,
                         stem=stem)
                     is_root = False

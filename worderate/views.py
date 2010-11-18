@@ -12,24 +12,26 @@ from worderate.models import WordDB
 
 from profiler import profile
 
-@profile("worderate.prof")
 def _worderate(dbmix=None):
     if not dbmix:
-        dbmix = {'src/words.txt':1}
+        dbmix = {'src/british':1}
     dblist = []
     for k, v in dbmix.items():
         dblist.extend([k]*v)
     whichdb = random.choice(dblist)
-    start_stem = Stem.objects.filter(worddb__name=whichdb,
+    start_stem = Stem.objects.filter(word__worddb__name=whichdb,
                                      is_root=True).order_by('?')[0]
-    next_tail = start_stem.pick_next_tail()
+    next_tail = start_stem.pick_next_tail(dbname=whichdb)
     word = start_stem.word.word + next_tail.word.word
     while True:
-        next_stem = Stem.objects.filter(word=Word.objects.get(
-            word=word[-3:])).order_by('?')[0]
+        next_stem = Stem.objects.filter(
+            word=Word.objects.get(
+                word=word[-3:]),
+                word__worddb__name=whichdb).order_by('?')[0]
         if not next_stem.tails.all():
+            # should never happen
             return _worderate(dbmix=dbmix)
-        if len(word) > 7:
+        if len(word) > 6:
             next_tail = next_stem.pick_next_tail(dbname=whichdb,
                                                  prefer_end=True)
         else:

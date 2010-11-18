@@ -21,19 +21,20 @@ class CustomUser(User):
         return ("user", (self.id,))
 
 
+class WordDB(models.Model):
+    name = models.CharField(max_length=15)
+    description = models.CharField(max_length=120)
+
+
 class Word(models.Model):
+    worddb = models.ForeignKey(WordDB)
     word = models.CharField(max_length=4)
     
     def __unicode__(self):
         return self.word.strip() or "END"
 
 
-class WordDB(models.Model):
-    name = models.CharField(max_length=15)
-    description = models.CharField(max_length=120)
-
 class Stem(models.Model):
-    worddb = models.ForeignKey(WordDB)
     word = models.ForeignKey(Word,
                              related_name='stems')
     is_root = models.BooleanField(default=False)
@@ -49,7 +50,7 @@ class Stem(models.Model):
             if not tails.count():
                 return self.pick_next_tail(dbname=dbname)
         if dbname:
-            specific_tails = tails.filter(worddb__name=dbname)
+            specific_tails = tails.filter(word__worddb__name=dbname)
             if specific_tails.count():
                 tails = specific_tails
         if not tails.count():
@@ -58,7 +59,6 @@ class Stem(models.Model):
 
 
 class Tail(models.Model):
-    worddb = models.ForeignKey(WordDB)
     word = models.ForeignKey(Word)
     stem = models.ForeignKey(Stem,
                              related_name='tails',

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+
+<script type="text/javascript">
+  setTimeout('document.getElementById("word").style.backgroundImage="url(/media/drbrown1.gif)"', 800);
+
+</script>
+
+<div id="left-col">
+ <em>Doctor, please could you worderate a word that is...</em>
+<form method="GET">
+<div id="databases">
+  {% for db in databases %}
+   <input type="number" size="1" name="db__{{db.name}}" value="{{db.mix|default:1}}" /> parts {{ db.description }} <br /> 
+  {% endfor %}
+</div>
+    <input type="submit" name="worderate" value="worderate!" />
+</form>
+</div>
+
+<div id="right-col">
+{% if word %}
+ <p>Your freshly created word is:</p>
+ <h1 id="word">{{ word }}</h1>
+{% endif %}
+</div>
+
+{% endblock %}
+

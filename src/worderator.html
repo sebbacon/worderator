@@ -1,0 +1,60 @@
+<html>
+<body>
+<script type="text/javascript" language="javascript">
+    function makeRequest(url) {
+        var httpRequest;
+
+        if (window.XMLHttpRequest) { // Mozilla, Safari, ...
+            httpRequest = new XMLHttpRequest();
+            if (httpRequest.overrideMimeType) {
+                httpRequest.overrideMimeType('text/xml');
+                // See note below about this line
+            }
+        } 
+        else if (window.ActiveXObject) { // IE
+            try {
+                httpRequest = new ActiveXObject("Msxml2.XMLHTTP");
+            } 
+            catch (e) {
+                try {
+                    httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+                } 
+                catch (e) {}
+
+           }
+        }
+
+        if (!httpRequest) {
+            alert('Giving up :( Cannot create an XMLHTTP instance');
+            return false;
+        }
+        httpRequest.onreadystatechange = function() { worderate(httpRequest); };
+        httpRequest.open('GET', url, true);
+        httpRequest.send('');
+
+    }
+
+   function worderate(httpRequest) {
+
+        if (httpRequest.readyState == 4) {
+            if (httpRequest.status == 200) {
+                document.getElementById('words').innerHTML = httpRequest.responseText;
+            } else {
+                alert('There was a problem with the request.');
+            }
+        }
+
+    }
+</script>
+
+<span
+    style="cursor: pointer; text-decoration: underline"
+    onclick="makeRequest('./do.php')">
+        Worderate me some words, Lady Mayoress!
+</span>
+<pre id="words">
+</pre>
+<img src="woman.jpg" />
+</body>
+</html>
+

@@ -1,0 +1,57 @@
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xml:lang="{% firstof LANGUAGE_CODE 'en' %}"
+    lang="{% firstof LANGUAGE_CODE 'en' %}">
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+    {% block css %}
+      <link rel="icon" type="image/x-icon" href="{{ MEDIA_URL }}favicon.ico" />
+      <link rel="stylesheet" href="{{ MEDIA_URL }}screen.css" type="text/css" media="screen, projection"/>
+      <link rel="stylesheet" href="{{ MEDIA_URL }}print.css" type="text/css" media="print"/>
+<!--[if IE]><link rel="stylesheet" href="{{ MEDIA_URL }}ie.css" type="text/css" media="screen, projection"/><![endif]-->
+      <link rel="stylesheet" type="text/css"  media="screen" href="{{ MEDIA_URL }}main.css" />
+    {% endblock %}
+    {% block js %}
+    <script type="text/javascript" src="{{ MEDIA_URL }}code.js"></script>
+    {% endblock %}
+
+    {% block extra-head %}{% endblock %}
+  </head>
+
+  <body id="section-{% block section %}home{% endblock %}">
+    {% block header %}
+
+    <div id="header">
+
+     <div id="logo">
+      <h1>Doctor Brown's Linguisticky Worderator</h1>
+     </div>
+
+     <div id="pages">
+      <ul>
+        {% for page in pages %}
+        <li{% if forloop.last %} class="lastnav"{% endif %}><a href="{{ page.url }}">{{ page.title }}</a></li>
+        {% endfor %}
+        {% block navigation %}
+        {% endblock %}
+       </ul>
+     </div>
+
+    </div>
+       
+    {% endblock %}
+
+
+    <div id="main">
+
+   {% block content %}
+
+   
+   {% endblock %}
+
+    </div>
+
+  </body>
+</html>

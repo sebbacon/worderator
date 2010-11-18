@@ -9,8 +9,31 @@ from forms import LoginForm
 from worderate.models import Stem
 from worderate.models import Word
 from worderate.models import WordDB
+from settings import FALLBACK_DB
+from settings import SPLITSIZE
+from settings import PREFER_MAXSIZE
 
 from profiler import profile
+
+def _get_next_stem(word, whichdb=None):
+    if len(word) < PREFER_MAXSIZE + 1 and whichdb:
+        try:
+            wordob = Word.objects.get(word=word[-SPLITSIZE:],
+                                      worddb__name=whichdb)
+        except Word.DoesNotExist:
+            return _get_next_stem(word)
+        next_stem = Stem.objects.filter(
+            word=wordob)
+        if len(word) > PREFER_MAXSIZE:
+            next_stem_with_end = next_stem.filter(tails__in="")
+            if next_stem_with_end.count():
+                next_stem = next_stem_with_end
+    else:
+        wordob = Word.objects.filter(
+            word=word[-SPLITSIZE:]).order_by('?')[0]
+        next_stem = Stem.objects.filter(
+            word=wordob)
+    return next_stem.order_by('?')[0]
 
 def _worderate(dbmix=None):
     if not dbmix:
@@ -21,21 +44,17 @@ def _worderate(dbmix=None):
     whichdb = random.choice(dblist)
     start_stem = Stem.objects.filter(word__worddb__name=whichdb,
                                      is_root=True).order_by('?')[0]
-    next_tail = start_stem.pick_next_tail(dbname=whichdb)
+    next_tail = start_stem.pick_next_tail()
     word = start_stem.word.word + next_tail.word.word
     while True:
-        next_stem = Stem.objects.filter(
-            word=Word.objects.get(
-                word=word[-3:]),
-                word__worddb__name=whichdb).order_by('?')[0]
-        if not next_stem.tails.all():
-            # should never happen
-            return _worderate(dbmix=dbmix)
-        if len(word) > 6:
-            next_tail = next_stem.pick_next_tail(dbname=whichdb,
-                                                 prefer_end=True)
+        whichdb = random.choice(dblist)
+        next_stem = _get_next_stem(word, whichdb)
+        if not next_stem or not next_stem.tails.all():
+            next_stem = _get_next_stem(word)
+        if len(word) > 5:
+            next_tail = next_stem.pick_next_tail(prefer_end=True)
         else:
-            next_tail = next_stem.pick_next_tail(dbname=whichdb)            
+            next_tail = next_stem.pick_next_tail()
         if not next_tail.word.word.strip():
             break
         word += next_tail.word.word

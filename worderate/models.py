@@ -25,13 +25,16 @@ class WordDB(models.Model):
     name = models.CharField(max_length=15)
     description = models.CharField(max_length=120)
 
+    def __unicode__(self):
+        return "%s: %s" % (self.name, self.description)
 
 class Word(models.Model):
     worddb = models.ForeignKey(WordDB)
     word = models.CharField(max_length=4)
     
     def __unicode__(self):
-        return self.word.strip() or "END"
+        return "%s (%s)" % (self.word.strip() or "END",
+                            self.worddb.description or self.worddb.name)
 
 
 class Stem(models.Model):
@@ -40,21 +43,17 @@ class Stem(models.Model):
     is_root = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return "%s: %s" % (self.word,
-                           [x for x in self.tails.all()])
+        return "%s: %s" % (self.word, self.tails_str())
 
-    def pick_next_tail(self, dbname=None, prefer_end=False):
+    def tails_str(self):
+        return ", ".join([x.word.word for x in self.tails.all()])
+
+    def pick_next_tail(self, prefer_end=False):
         tails = self.tails.all()
         if prefer_end:
             tails = tails.filter(word__word="")
             if not tails.count():
-                return self.pick_next_tail(dbname=dbname)
-        if dbname:
-            specific_tails = tails.filter(word__worddb__name=dbname)
-            if specific_tails.count():
-                tails = specific_tails
-        if not tails.count():
-            return self.pick_next_tail()
+                return self.pick_next_tail()
         return tails.order_by('?')[0]
 
 
@@ -66,4 +65,4 @@ class Tail(models.Model):
                              null=True)
 
     def __unicode__(self):
-        return "%s from db %s" % (self.word, self.worddb.name)
+        return unicode(self.word)

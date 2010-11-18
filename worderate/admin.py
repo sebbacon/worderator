@@ -9,5 +9,14 @@ class UserAdmin(admin.ModelAdmin):
 class WordDBAdmin(admin.ModelAdmin):
     list_display = ('name','description')
 
+class TailInline(admin.TabularInline):
+    model = models.Tail
+    raw_id_fields = ("word",)
+    
+class StemAdmin(admin.ModelAdmin):
+    list_display = ('word','is_root', 'tails_str',)
+    inlines = [TailInline,]
+    
 admin.site.register(models.CustomUser, UserAdmin)
 admin.site.register(models.WordDB, WordDBAdmin)
+admin.site.register(models.Stem, StemAdmin)

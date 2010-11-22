@@ -12,11 +12,13 @@ from worderate.models import WordDB
 from settings import FALLBACK_DB
 from settings import SPLITSIZE
 from settings import PREFER_MAXSIZE
+from settings import HARD_MAXSIZE
+from settings import FALLBACK_DB
 
 from profiler import profile
 
 def _get_next_stem(word, whichdb=None):
-    if len(word) < PREFER_MAXSIZE + 1 and whichdb:
+    if whichdb:
         try:
             wordob = Word.objects.get(word=word[-SPLITSIZE:],
                                       worddb__name=whichdb)
@@ -33,7 +35,9 @@ def _get_next_stem(word, whichdb=None):
             word=word[-SPLITSIZE:]).order_by('?')[0]
         next_stem = Stem.objects.filter(
             word=wordob)
-    return next_stem.order_by('?')[0]
+    result = next_stem.order_by('?')[0]
+    print result
+    return result
 
 def _worderate(dbmix=None):
     if not dbmix:
@@ -47,6 +51,8 @@ def _worderate(dbmix=None):
     next_tail = start_stem.pick_next_tail()
     word = start_stem.word.word + next_tail.word.word
     while True:
+        if len(word) > HARD_MAXSIZE:
+            return _worderate(dbmix)
         whichdb = random.choice(dblist)
         next_stem = _get_next_stem(word, whichdb)
         if not next_stem or not next_stem.tails.all():
@@ -71,6 +77,12 @@ def home(request):
                 dbmix[database.name] = int(val)
                 database.mix = val
         word = _worderate(dbmix=dbmix)
+    else:
+        for database in databases:
+            if database.name == FALLBACK_DB:
+                database.mix = 1
+            else:
+                database.mix = 0
     return locals()
         
 

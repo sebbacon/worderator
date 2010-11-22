@@ -12,8 +12,9 @@
  <em>Doctor, please could you worderate a word that is...</em>
 <form method="GET">
 <div id="databases">
+   <input type="hidden" name="worderate" value="worderate!" />
   {% for db in databases %}
-   <input type="number" size="1" name="db__{{db.name}}" value="{{db.mix|default:1}}" /> parts {{ db.description }} <br /> 
+   <input type="number" size="1" name="db__{{db.name}}" value="{{db.mix}}" /> parts {{ db.description }} <br /> 
   {% endfor %}
 </div>
     <input type="submit" name="worderate" value="worderate!" />
@@ -21,10 +22,14 @@
 </div>
 
 <div id="right-col">
+ <p>
 {% if word %}
- <p>Your freshly created word is:</p>
- <h1 id="word">{{ word }}</h1>
+Your freshly worderated word is:
+{% else %}
+Click Dr Brown's face and he will worderate:
 {% endif %}
+</p>
+ <h1 id="word" onclick="document.forms[0].submit()" style="cursor: hand; cursor:pointer">{{ word }}</h1>
 </div>
 
 {% endblock %}

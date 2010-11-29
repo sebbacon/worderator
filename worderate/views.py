@@ -42,7 +42,7 @@ def _get_next_stem(word, whichdb=None):
 def _worderate(dbmix=None):
     if not dbmix:
         dbmix = {'src/british':1}
-    dblist = []
+    dblist = ['src/british']
     for k, v in dbmix.items():
         dblist.extend([k]*v)
     whichdb = random.choice(dblist)

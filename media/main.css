@@ -11,6 +11,11 @@ h1 {
  line-height: 1;
 }
 
+h2 {
+ font-size: 1,5em;
+ font-weight: bold;
+}
+
 em {
  font-style: italic;
 }
